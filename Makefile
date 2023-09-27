@@ -1,5 +1,5 @@
-#   invisreg - suite of utilities for hiding registry keys
-#   Copyright (C) 2023  Sabrina Andersen (NukingDragons)
+# invisreg - suite of utilities for hiding registry keys
+# Copyright (C) 2023  Sabrina Andersen (NukingDragons)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,17 +16,32 @@
 
 CC = x86_64-w64-mingw32-gcc
 
-.PHONY: all
+CFLAGS := -O2
+_CFLAGS := -Iinclude -Icustom-errno/include
+
+SRCS = custom-errno/error.c \
+	   invis/ntdll.c \
+	   invis/reg.c \
+	   invisreg.c
+
+# Target based rules
+
+.PHONY: all clean invisreg
+
 all: invisreg
 
-.PHONY: clean
 clean:
-	find . \( -name "*.o" -or -name "*.exe" \) -exec rm -rf {} \;
+	find . \( -name "*.o" -or -name "*.exe" \) -exec rm {} \; || true
 
-invisreg: invis/ntdll.o invis/reg.o invisreg.o
-	$(CC) $(CFLAGS) $^ -o $@
+# File based rules
+
+custom-errno/error.c:
+	git submodule update --init --recursive --remote
+
+invisreg: $(SRCS:.c=.o)
+	$(CC) $(_CLFAGS) $(CFLAGS) $^ -o $@
+
+# Glob based rules
 
 %.o: %.c
-	@printf "Compiling $(<)...\n"
-	$(CC) $(CFLAGS) -I"include" -c $< -o $@
-
+	$(CC) $(_CFLAGS) $(CFLAGS) -c $^ -o $@

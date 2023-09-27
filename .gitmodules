@@ -1,0 +1,3 @@
+[submodule "custom-errno"]
+	path = custom-errno
+	url = https://github.com/nukingdragons/custom-errno.git

@@ -1,19 +1,19 @@
 /*
- *    invisreg - suite of utilities for hiding registry keys
- *    Copyright (C) 2023  Sabrina Andersen (NukingDragons)
+ * invisreg - suite of utilities for hiding registry keys
+ * Copyright (C) 2023  Sabrina Andersen (NukingDragons)
  *
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 #ifndef _NTDLL_H_
@@ -45,7 +45,14 @@ typedef struct _KEY_VALUE_FULL_INFORMATION {
 	WCHAR Name[1];
 } KEY_VALUE_FULL_INFORMATION, * PKEY_VALUE_FULL_INFORMATION;
 
-#define OBJ_KERNEL_HANDLE 0x00000200
+#define OBJ_KERNEL_HANDLE				0x00000200
+
+#define STATUS_SUCCESS					0x00000000
+#define STATUS_BUFFER_OVERFLOW			0x80000005
+#define STATUS_ACCESS_DENIED			0xC0000022
+#define STATUS_BUFFER_TOO_SMALL			0xC0000023
+#define STATUS_OBJECT_NAME_NOT_FOUND	0xC0000034
+#define STATUS_CANNOT_DELETE			0xC0000121
 
 // Internals function declarations
 typedef NTSTATUS (*_NtCreateKey)(PHANDLE, ACCESS_MASK, POBJECT_ATTRIBUTES, ULONG, PUNICODE_STRING, ULONG, PULONG);
