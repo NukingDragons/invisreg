@@ -61,7 +61,7 @@ void usage(char *name, FILE *f)
 			"\t--edit,-e\t\tEdit an invisible registry key\n"
 			"\t--delete,-d\t\tDelete an invisible registry key\n"
 			"\t--query,-q\t\tQuery an invisible registry key\n"
-			"\t--visible,-v\t\tMake the key visible\n"
+			"\t--visible,-V\t\tMake the key visible\n"
 			"\t--type,-t\t\tSpecify the data type of the registry key\n"
 			"\t--key,-k\t\tThe key to create as an invisible key\n"
 			"\t--value,-v\t\tThe data of the specified type to place into the key\n"
@@ -158,7 +158,7 @@ struct args_t parse_args(int32_t argc, char **argv, int32_t min_args)
 
 				args.query = 1;
 			}
-			else if (check_arg("--visible", "-v"))
+			else if (check_arg("--visible", "-V"))
 			{
 				if (args.visible)
 					set_errno(ETOOMANY);
