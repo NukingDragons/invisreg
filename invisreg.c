@@ -67,18 +67,19 @@ void usage(char *name, FILE *f)
 			"\t--value,-v\t\tThe data of the specified type to place into the key\n"
 			"\n"
 			"Only the following hives are supported:\n"
-			" HKLM        = HKEY_LOCAL_MACHINE\n"
-			" HKCU or HCU = HKEY_CURRENT_USER\n"
-			" HKCR        = HKEY_CLASSES_ROOT\n"
-			" HKCC        = HKEY_CURRENT_CONFIG\n"
-			" HKU         = HKEY_USERS\n"
+			" HKLM          = HKEY_LOCAL_MACHINE\n"
+			" HKCU or HCU   = HKEY_CURRENT_USER\n"
+			" HKCR          = HKEY_CLASSES_ROOT\n"
+			" HKCC          = HKEY_CURRENT_CONFIG\n"
+			" HKU           = HKEY_USERS\n"
 			"Only the following types are currently supported:\n"
-			" REG_NONE    = Value will be ignored, and is the default type\n"
-			" REG_SZ      = Value is expected to be a string\n"
-			" REG_DWORD   = Value is expected to be a 32-bit integer\n"
-			" REG_QWORD   = Value is expected to be a 64-bit integer\n"
-			" REG_BINARY  = Value is expected to be the name of a file\n"
-			"               This file is read into this program and placed into the key\n"
+			" REG_NONE      = Value will be ignored, and is the default type\n"
+			" REG_SZ        = Value is expected to be a string\n"
+			" REG_EXPAND_SZ = Value is expected to be a string\n"
+			" REG_DWORD     = Value is expected to be a 32-bit integer\n"
+			" REG_QWORD     = Value is expected to be a 64-bit integer\n"
+			" REG_BINARY    = Value is expected to be the name of a file\n"
+			"                 This file is read into this program and placed into the key\n"
 			"\n"
 			"Examples:\n"
 			" " NAME " --key HKLM:\\SOFTWARE\\MICROSOFT\\Windows\\CurrentVersion\\Run\\KeyName --type REG_SZ --create --value \"calc.exe\"\n"
@@ -180,6 +181,8 @@ struct args_t parse_args(int32_t argc, char **argv, int32_t min_args)
 							args.type = REG_NONE;
 						else if (!strcmp(type, "REG_SZ"))
 							args.type = REG_SZ;
+						else if (!strcmp(type, "REG_EXPAND_SZ"))
+							args.type = REG_EXPAND_SZ;
 						else if (!strcmp(type, "REG_DWORD"))
 							args.type = REG_DWORD;
 						else if (!strcmp(type, "REG_QWORD"))
@@ -269,6 +272,8 @@ struct args_t parse_args(int32_t argc, char **argv, int32_t min_args)
 				{
 					switch (args.type)
 					{
+						case REG_EXPAND_SZ:
+							/* fall through */
 						case REG_SZ:
 							// * 2 for UTF-16LE
 							args.value_size = strlen(value) * 2;
@@ -345,8 +350,6 @@ int32_t main(int32_t argc, char **argv)
 
 		uint8_t operation = 0;
 
-		void *value = args.value;
-
 		if (args.create || args.edit)
 			operation |= OPERATION_CREATE;
 
@@ -354,41 +357,52 @@ int32_t main(int32_t argc, char **argv)
 			operation |= OPERATION_DELETE;
 
 		if (args.query)
-		{
 			operation |= OPERATION_QUERY;
-
-			// When the op is a query, this becomes an output variable
-			args.value = 0;
-			value = &args.value;
-		}
 
 		if (args.visible)
 			operation |= MAKE_VISIBLE;
 
-		if (!reg(operation, args.hive, args.path, &args.type, value, &args.value_size))
+		struct key_data_t *key_data = 0;
+		uint64_t num_keys = 0;
+		if (!reg(operation, args.hive, args.path, args.type, args.value, args.value_size, &key_data, &num_keys))
 		{
-			if (args.query)
-				switch (args.type)
+			if (args.query && key_data && num_keys)
+			{
+				for (uint64_t i = 0; i < num_keys; i++)
 				{
-					case REG_SZ:
-						printf("REG_SZ\t%ls\n", (wchar_t *) args.value);
-						break;
-					case REG_DWORD:
-						printf("REG_DWORD\t%d\n", *(uint32_t *) args.value);
-						break;
-					case REG_QWORD:
-						printf("REG_QWORD\t%ld\n", *(uint64_t *) args.value);
-						break;
-					case REG_BINARY:
-						printf("REG_BINARY\tTODO\n");
-						break;
-					case REG_NONE:
-						printf("REG_NONE\n");
-						break;
-					default:
-						printf("REG_UNK\n");
-						break;
-				};
+					if (key_data[i].name)
+					{
+						printf("%ls:\n", key_data[i].name);
+						printf("\t%s\t", (key_data[i].invis) ? "INVISIBLE" : "VISIBLE\t");
+						switch (key_data[i].type)
+						{
+							case REG_EXPAND_SZ:
+								printf("REG_EXPAND_SZ\t%ls\n", (wchar_t *) key_data[i].value);
+								break;
+							case REG_SZ:
+								printf("REG_SZ\t\t%ls\n", (wchar_t *) key_data[i].value);
+								break;
+							case REG_DWORD:
+								printf("REG_DWORD\t%d\n", *(uint32_t *) key_data[i].value);
+								break;
+							case REG_QWORD:
+								printf("REG_QWORD\t%ld\n", *(uint64_t *) key_data[i].value);
+								break;
+							case REG_BINARY:
+								printf("REG_BINARY\tTODO\n");
+								break;
+							case REG_NONE:
+								printf("REG_NONE\n");
+								break;
+							default:
+								printf("REG_UNK\n");
+								break;
+						};
+					}
+				}
+
+				free_key_data(key_data, num_keys);
+			}
 
 			printf("Completed successfully!\n");
 		}

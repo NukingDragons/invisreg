@@ -18,13 +18,14 @@
 
 #include <invis/ntdll.h>
 
-_NtCreateKey      NtCreateKey;
-_NtSetValueKey    NtSetValueKey;
-_NtDeleteKey      NtDeleteKey;
-_NtDeleteValueKey NtDeleteValueKey;
-_NtQueryKey       NtQueryKey;
-_NtQueryValueKey  NtQueryValueKey;
-_NtClose          NtClose;
+_NtCreateKey         NtCreateKey;
+_NtSetValueKey       NtSetValueKey;
+_NtDeleteKey         NtDeleteKey;
+_NtDeleteValueKey    NtDeleteValueKey;
+_NtQueryKey          NtQueryKey;
+_NtQueryValueKey     NtQueryValueKey;
+_NtEnumerateValueKey NtEnumerateValueKey;
+_NtClose             NtClose;
 
 void init_ntdll(void)
 {
@@ -34,15 +35,17 @@ void init_ntdll(void)
 	||  !NtDeleteValueKey
 	||  !NtQueryKey
 	||  !NtQueryValueKey
+	||  !NtEnumerateValueKey
 	||  !NtClose)
 	{
-		HANDLE ntdll     = LoadLibraryA("ntdll.dll");
-		NtCreateKey      = (_NtCreateKey)      GetProcAddress(ntdll, "NtCreateKey");
-	    NtSetValueKey    = (_NtSetValueKey)    GetProcAddress(ntdll, "NtSetValueKey");
-	    NtDeleteKey      = (_NtDeleteKey)      GetProcAddress(ntdll, "NtDeleteKey");
-	    NtDeleteValueKey = (_NtDeleteValueKey) GetProcAddress(ntdll, "NtDeleteValueKey");
-		NtQueryKey       = (_NtQueryKey)       GetProcAddress(ntdll, "NtQueryKey");
-		NtQueryValueKey  = (_NtQueryValueKey)  GetProcAddress(ntdll, "NtQueryValueKey");
-		NtClose          = (_NtClose)          GetProcAddress(ntdll, "NtClose");
+		HANDLE ntdll        = LoadLibraryA("ntdll.dll");
+		NtCreateKey         = (_NtCreateKey)         GetProcAddress(ntdll, "NtCreateKey");
+	    NtSetValueKey       = (_NtSetValueKey)       GetProcAddress(ntdll, "NtSetValueKey");
+	    NtDeleteKey         = (_NtDeleteKey)         GetProcAddress(ntdll, "NtDeleteKey");
+	    NtDeleteValueKey    = (_NtDeleteValueKey)    GetProcAddress(ntdll, "NtDeleteValueKey");
+		NtQueryKey          = (_NtQueryKey)          GetProcAddress(ntdll, "NtQueryKey");
+		NtQueryValueKey     = (_NtQueryValueKey)     GetProcAddress(ntdll, "NtQueryValueKey");
+		NtEnumerateValueKey = (_NtEnumerateValueKey) GetProcAddress(ntdll, "NtEnumerateValueKey");
+		NtClose             = (_NtClose)             GetProcAddress(ntdll, "NtClose");
 	}
 }

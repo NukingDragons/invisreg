@@ -49,6 +49,7 @@ typedef struct _KEY_VALUE_FULL_INFORMATION {
 
 #define STATUS_SUCCESS					0x00000000
 #define STATUS_BUFFER_OVERFLOW			0x80000005
+#define STATUS_NO_MORE_ENTRIES			0x8000001A
 #define STATUS_ACCESS_DENIED			0xC0000022
 #define STATUS_BUFFER_TOO_SMALL			0xC0000023
 #define STATUS_OBJECT_NAME_NOT_FOUND	0xC0000034
@@ -61,16 +62,18 @@ typedef NTSTATUS (*_NtDeleteKey)(HANDLE);
 typedef NTSTATUS (*_NtDeleteValueKey)(HANDLE, PUNICODE_STRING);
 typedef NTSTATUS (*_NtQueryKey)(HANDLE, ULONG, PVOID, ULONG, PULONG);
 typedef NTSTATUS (*_NtQueryValueKey)(HANDLE, PUNICODE_STRING, ULONG, PVOID, ULONG, PULONG);
+typedef NTSTATUS (*_NtEnumerateValueKey)(HANDLE, ULONG, ULONG, PVOID, ULONG, PULONG);
 typedef NTSTATUS (*_NtClose)(HANDLE);
 
 // Internals functions
-extern _NtCreateKey      NtCreateKey;
-extern _NtSetValueKey    NtSetValueKey;
-extern _NtDeleteKey      NtDeleteKey;
-extern _NtDeleteValueKey NtDeleteValueKey;
-extern _NtQueryKey       NtQueryKey;
-extern _NtQueryValueKey  NtQueryValueKey;
-extern _NtClose          NtClose;
+extern _NtCreateKey         NtCreateKey;
+extern _NtSetValueKey       NtSetValueKey;
+extern _NtDeleteKey         NtDeleteKey;
+extern _NtDeleteValueKey    NtDeleteValueKey;
+extern _NtQueryKey          NtQueryKey;
+extern _NtQueryValueKey     NtQueryValueKey;
+extern _NtEnumerateValueKey NtEnumerateValueKey;
+extern _NtClose             NtClose;
 
 void init_ntdll(void);
 

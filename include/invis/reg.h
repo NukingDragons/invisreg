@@ -32,14 +32,34 @@
 #define MAKE_VISIBLE	(1<<3)
 #define MAKE_KEY		(1<<4)
 
+struct key_data_t
+{
+	ULONG type;
+	wchar_t *name;
+	void *value;
+	uint32_t size;
+
+	int8_t invis;
+};
+
 /*
  * For value keys:
- *  On create/edit: type, value, and size are input variables and are required
- *  On delete: type, value, and size are ignored
- *  On query: type, value, and size are outputs. (the output of value is a pointer to the data, callee must free)
+ *  On create/edit: type, value, and size are input variables and are required.
+ *                  key_data and num_keys are always ignored
+ *  On delete/query: type, value, and size are ignored
+ *  On query: key_data and num_keys are outputs
  * For keys (MAKE_KEY):
  *  type, value, and size are all ignored
  */
-int reg(int8_t operation, HKEY hive, char *path, ULONG *type, void *value, uint32_t *size);
+int reg(int8_t              operation,
+		HKEY                hive,
+		char               *path,
+		ULONG               type,
+		void               *value,
+		uint32_t            size,
+		struct key_data_t **key_data,
+		uint64_t           *num_keys);
+
+void free_key_data(struct key_data_t *key_data, uint64_t num_keys);
 
 #endif
